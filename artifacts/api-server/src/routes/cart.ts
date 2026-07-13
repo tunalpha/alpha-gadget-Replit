@@ -61,7 +61,8 @@ async function computeCart(
     }
   }
 
-  const shipping = subtotal - discount >= 49 || hasFreeShippingPromo ? 0 : 4.99;
+  const allOfferItems = lineItems.length > 0 && lineItems.every((i) => i.price <= 0.99);
+  const shipping = subtotal - discount >= 49 || hasFreeShippingPromo || allOfferItems ? 0 : 4.99;
   const total = Math.round((subtotal - discount + shipping) * 100) / 100;
 
   return {

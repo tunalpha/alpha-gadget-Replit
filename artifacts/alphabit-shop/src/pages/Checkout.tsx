@@ -113,7 +113,8 @@ export default function Checkout() {
       };
     }
     const subtotal = cartSubtotal;
-    const shipping = subtotal >= 49 ? 0 : 5.90;
+    const allOfferItems = items.length > 0 && items.every((i) => i.price <= 0.99);
+    const shipping = subtotal >= 49 || allOfferItems ? 0 : 5.90;
     return { subtotal, shipping, discount: 0, total: subtotal + shipping };
   };
 
