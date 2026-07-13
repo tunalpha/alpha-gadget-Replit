@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Alpha Bit Gadget Shop"
+version = "1.0.0"
+id = "artifacts/alphabit-shop"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21293
+
+[services.development]
+run = "pnpm --filter @workspace/alphabit-shop run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/alphabit-shop", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/alphabit-shop/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21293"
+BASE_PATH = "/"
