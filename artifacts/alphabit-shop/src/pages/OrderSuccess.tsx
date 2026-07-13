@@ -10,7 +10,7 @@ import { Link } from 'wouter';
 export default function OrderSuccess() {
   const params = useParams();
   const id = params.id as string;
-  const { data: order, isLoading, isError } = useGetOrder(id, {
+  const { data: order, isLoading, isError, refetch } = useGetOrder(id, {
     query: {
       enabled: !!id,
       retry: 2,
@@ -18,12 +18,18 @@ export default function OrderSuccess() {
     }
   });
 
-  // Simulated Polling to wait for payment processing if needed
   const [showContent, setShowContent] = useState(false);
+
+  // Confirm payment and send emails as soon as the page loads
   useEffect(() => {
+    if (!id) return;
+    fetch(`/api/payments/confirm/${id}`, { method: 'POST' })
+      .then(() => refetch())
+      .catch(() => {}); // non-blocking
+
     const timer = setTimeout(() => setShowContent(true), 1500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [id]);
 
   if (isError) {
     return (

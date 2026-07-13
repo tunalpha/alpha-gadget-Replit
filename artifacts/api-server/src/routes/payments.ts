@@ -1,5 +1,8 @@
 import { Router, Request, Response } from "express";
 import { getDb, ObjectId, serializeDoc } from "../lib/mongo";
+import { sendOrderStatusEmail, sendAdminNewOrderEmail } from "../lib/mailer";
+
+const ADMIN_EMAIL = process.env["ADMIN_EMAIL"] || "";
 
 const router = Router();
 
@@ -154,6 +157,68 @@ router.get("/status/:orderId", async (req: Request, res: Response) => {
     });
   } catch (err) {
     req.log?.error({ err }, "getPaymentStatus error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// POST /api/payments/confirm/:orderId
+// Called by the success page to mark order as paid and send emails
+router.post("/confirm/:orderId", async (req: Request, res: Response) => {
+  try {
+    const db = getDb();
+    const { orderId } = req.params;
+
+    let order = null;
+    try {
+      order = await db.collection("orders").findOne({ _id: new ObjectId(orderId) });
+    } catch {
+      res.status(400).json({ error: "Invalid order ID" });
+      return;
+    }
+    if (!order) {
+      res.status(404).json({ error: "Order not found" });
+      return;
+    }
+
+    // Only update if not already paid
+    if (order.payment_status !== "paid") {
+      await db.collection("orders").updateOne(
+        { _id: new ObjectId(orderId) },
+        { $set: { payment_status: "paid", status: "processing", updated_at: new Date() } }
+      );
+
+      // Email customer: payment confirmed
+      if (order.customer_email) {
+        sendOrderStatusEmail({
+          to: order.customer_email as string,
+          customerName: (order.customer_name as string) || "Cliente",
+          orderId,
+          status: "processing",
+        }).catch((e) => console.error("sendOrderStatusEmail (confirm) failed:", e));
+      }
+
+      // Email admin
+      if (ADMIN_EMAIL && order.items) {
+        const items = (order.items as Array<{ name: string; quantity: number; price: number }>).map((i) => ({
+          name: i.name || "Prodotto",
+          quantity: i.quantity,
+          price: i.price,
+        }));
+        sendAdminNewOrderEmail({
+          adminEmail: ADMIN_EMAIL,
+          orderId,
+          customerName: (order.customer_name as string) || "Cliente",
+          customerEmail: (order.customer_email as string) || "",
+          total: (order.total as number) || 0,
+          items,
+        }).catch((e) => console.error("sendAdminNewOrderEmail (confirm) failed:", e));
+      }
+    }
+
+    const updated = await db.collection("orders").findOne({ _id: new ObjectId(orderId) });
+    res.json(serializeDoc(updated as Record<string, unknown>));
+  } catch (err) {
+    req.log?.error({ err }, "confirmPayment error");
     res.status(500).json({ error: "Server error" });
   }
 });

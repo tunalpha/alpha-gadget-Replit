@@ -99,6 +99,52 @@ export async function sendOrderStatusEmail(opts: {
   });
 }
 
+export async function sendAdminNewOrderEmail(opts: {
+  adminEmail: string;
+  orderId: string;
+  customerName: string;
+  customerEmail: string;
+  total: number;
+  items: { name: string; quantity: number; price: number }[];
+}): Promise<void> {
+  const shortId = opts.orderId.slice(0, 8).toUpperCase();
+  const itemRows = opts.items
+    .map(
+      (i) =>
+        `<tr><td style="padding:4px 0;color:#374151">${i.name}</td><td style="text-align:center;color:#6b7280">x${i.quantity}</td><td style="text-align:right;color:#374151">€${i.price.toFixed(2)}</td></tr>`
+    )
+    .join("");
+
+  const body = `
+    <p>È arrivato un <strong>nuovo ordine</strong> sul tuo negozio.</p>
+    <div class="status-box">
+      <div style="font-size:28px;margin-bottom:6px">🛍️</div>
+      <div class="label">Ordine #${shortId}</div>
+      <p style="margin:6px 0 0;color:#6b7280;font-size:13px">${opts.customerName} — ${opts.customerEmail}</p>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <thead><tr style="border-bottom:2px solid #e5e7eb">
+        <th style="text-align:left;padding:6px 0;color:#6b7280;font-size:12px">PRODOTTO</th>
+        <th style="text-align:center;color:#6b7280;font-size:12px">QTÀ</th>
+        <th style="text-align:right;color:#6b7280;font-size:12px">PREZZO</th>
+      </tr></thead>
+      <tbody>${itemRows}</tbody>
+      <tfoot><tr style="border-top:2px solid #e5e7eb">
+        <td colspan="2" style="padding:8px 0;font-weight:700;color:#1f2937">Totale</td>
+        <td style="text-align:right;font-weight:700;color:#7c3aed">€${opts.total.toFixed(2)}</td>
+      </tr></tfoot>
+    </table>
+    <p><a href="https://alphabit.sbs/admin/ordini" style="color:#7c3aed;font-weight:600">Gestisci gli ordini →</a></p>
+  `;
+
+  await transporter.sendMail({
+    from: FROM,
+    to: opts.adminEmail,
+    subject: `🛍️ Nuovo ordine #${shortId} — €${opts.total.toFixed(2)}`,
+    html: baseTemplate(`Nuovo ordine #${shortId}`, body),
+  });
+}
+
 export async function sendOrderConfirmationEmail(opts: {
   to: string;
   customerName: string;

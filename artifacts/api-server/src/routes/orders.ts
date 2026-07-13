@@ -2,6 +2,9 @@ import { Router, Request, Response } from "express";
 import { getDb, ObjectId, serializeDoc } from "../lib/mongo";
 import { authMiddleware, AuthRequest } from "../lib/auth";
 import { computeCart } from "./cart";
+import { sendOrderConfirmationEmail, sendAdminNewOrderEmail } from "../lib/mailer";
+
+const ADMIN_EMAIL = process.env["ADMIN_EMAIL"] || "";
 
 const router = Router();
 
@@ -68,6 +71,32 @@ router.post("/", async (req: Request, res: Response) => {
       total: cartResult.total,
       message: "Ordine creato con successo",
     });
+
+    // Fire-and-forget emails
+    const emailItems = cartResult.items.map((i) => ({
+      name: (i.name as string) || "Prodotto",
+      quantity: i.quantity as number,
+      price: i.price as number,
+    }));
+
+    sendOrderConfirmationEmail({
+      to: customer_email,
+      customerName: customer_name,
+      orderId,
+      total: cartResult.total,
+      items: emailItems,
+    }).catch((e) => console.error("sendOrderConfirmationEmail failed:", e));
+
+    if (ADMIN_EMAIL) {
+      sendAdminNewOrderEmail({
+        adminEmail: ADMIN_EMAIL,
+        orderId,
+        customerName: customer_name,
+        customerEmail: customer_email,
+        total: cartResult.total,
+        items: emailItems,
+      }).catch((e) => console.error("sendAdminNewOrderEmail failed:", e));
+    }
   } catch (err) {
     req.log?.error({ err }, "createOrder error");
     res.status(500).json({ error: "Server error" });
