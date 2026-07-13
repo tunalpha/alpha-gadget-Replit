@@ -10,7 +10,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
-  const isOnSale = product.on_sale && product.sale_price !== null && product.sale_price !== undefined;
+  const isOnSale = product.sale_price !== null && product.sale_price !== undefined && product.sale_price < product.price;
   const currentPrice = isOnSale ? product.sale_price! : product.price;
   const discountPct = isOnSale
     ? Math.round((1 - product.sale_price! / product.price) * 100)
