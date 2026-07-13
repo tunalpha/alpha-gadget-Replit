@@ -1,34 +1,36 @@
-import express, { type Express } from "express";
+import express from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
-import router from "./routes";
+import cookieParser from "cookie-parser";
+import { pinoHttp } from "pino-http";
 import { logger } from "./lib/logger";
+import { connectMongo } from "./lib/mongo";
+import routes from "./routes";
 
-const app: Express = express();
+const app = express();
 
 app.use(
   pinoHttp({
     logger,
-    serializers: {
-      req(req) {
-        return {
-          id: req.id,
-          method: req.method,
-          url: req.url?.split("?")[0],
-        };
-      },
-      res(res) {
-        return {
-          statusCode: res.statusCode,
-        };
-      },
-    },
-  }),
+    autoLogging: { ignore: (req) => req.url === "/api/healthz" },
+  })
 );
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-app.use("/api", router);
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Connect MongoDB (non-fatal: server starts anyway, routes will 500 until DB is reachable)
+connectMongo().catch((err) => {
+  logger.error({ err }, "MongoDB connection failed — check MONGO_URL secret. Server will keep running.");
+});
+
+app.use("/api", routes);
 
 export default app;
