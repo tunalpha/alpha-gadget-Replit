@@ -101,7 +101,7 @@ export function Navbar() {
                 <Link href="/account" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-purple-50 hover:text-purple-700" onClick={() => setShowUserMenu(false)}>
                   <User className="w-4 h-4" /> Il mio account
                 </Link>
-                {user.is_admin && (
+                {user.role === 'admin' && (
                   <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-purple-50 hover:text-purple-700" onClick={() => setShowUserMenu(false)}>
                     <LayoutDashboard className="w-4 h-4" /> Admin
                   </Link>

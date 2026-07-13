@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Filter, X } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function Catalog() {
   const [location] = useLocation();
