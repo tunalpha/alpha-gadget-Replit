@@ -1,155 +1,203 @@
 import React from 'react';
-import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Zap, Shield, Battery, Headphones, Mouse } from 'lucide-react';
-import { useGetFeaturedProducts, useGetOfferProducts } from '@workspace/api-client-react';
+import { Link, useLocation } from 'wouter';
+import { ArrowRight } from 'lucide-react';
+import { useGetFeaturedProducts, useGetOfferProducts, useListCategories } from '@workspace/api-client-react';
 import { ProductCard } from '@/components/shared/ProductCard';
 
 export default function Home() {
-  const { data: featuredProducts, isLoading: isFeaturedLoading } = useGetFeaturedProducts({ limit: 8 });
-  const { data: offerProducts, isLoading: isOffersLoading } = useGetOfferProducts({ limit: 4 });
+  const [, setLocation] = useLocation();
+  const { data: featuredProducts, isLoading: isFeaturedLoading } = useGetFeaturedProducts({ limit: 6 });
+  const { data: offerProducts, isLoading: isOffersLoading } = useGetOfferProducts({ limit: 6 });
+  const { data: categoriesData } = useListCategories();
 
-  const categories = [
-    { id: 'cavi', name: 'Cavi & Adattatori', icon: <Zap className="w-8 h-8 mb-2 text-primary" />, desc: "Ricarica super veloce" },
-    { id: 'audio', name: 'Audio', icon: <Headphones className="w-8 h-8 mb-2 text-primary" />, desc: "Qualità del suono premium" },
-    { id: 'periferiche', name: 'Periferiche PC', icon: <Mouse className="w-8 h-8 mb-2 text-primary" />, desc: "Mouse e tastiere pro" },
-    { id: 'powerbank', name: 'Powerbank', icon: <Battery className="w-8 h-8 mb-2 text-primary" />, desc: "Energia sempre con te" }
-  ];
+  const categoryEmojis: Record<string, string> = {
+    'accessori computer': '💻',
+    'accessori gaming': '🎮',
+    'accessori smartphone': '📱',
+    'audio e cuffie': '🎧',
+    'caricatori e powerbank': '🔋',
+    'cavi e adattatori': '🔌',
+    'fotografia e video': '📷',
+    'organizzazione e viaggio': '🧳',
+    'smart home': '🏠',
+    'wearable e fitness': '⌚',
+  };
+
+  const getEmoji = (name: string) => {
+    const key = name.toLowerCase();
+    for (const [k, v] of Object.entries(categoryEmojis)) {
+      if (key.includes(k) || k.includes(key)) return v;
+    }
+    return '📦';
+  };
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-sidebar text-sidebar-foreground py-20 lg:py-32">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent z-10" />
-        <div 
-          className="absolute inset-0 z-0 opacity-40 mix-blend-overlay bg-cover bg-center"
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1550009158-9efff6c9706e?q=80&w=2070&auto=format&fit=crop")' }}
-        />
-        
-        <div className="container relative z-20 mx-auto px-4">
-          <div className="max-w-2xl">
-            <span className="inline-block py-1 px-3 rounded-full bg-primary/20 text-primary font-bold text-sm mb-6 border border-primary/30 uppercase tracking-wider">
-              Nuovi Arrivi 2024
-            </span>
-            <h1 className="text-5xl lg:text-7xl font-display font-black leading-tight text-white mb-6">
-              Il tuo setup.<br/>
-              <span className="text-primary">Evoluto.</span>
-            </h1>
-            <p className="text-lg lg:text-xl text-sidebar-foreground/80 mb-10 leading-relaxed max-w-xl">
-              Esplora la nostra selezione premium di accessori tech. Qualità eccellente, spedizione rapida in tutta Italia e assistenza dedicata.
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Button size="lg" className="h-14 px-8 text-base font-bold" asChild>
-                <Link href="/prodotti">
-                  Esplora il catalogo <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="h-14 px-8 text-base bg-white/5 border-white/20 hover:bg-white/10 text-white" asChild>
-                <Link href="/offerte">Vedi le offerte</Link>
-              </Button>
+      {/* Hero */}
+      <section
+        className="py-16 lg:py-24"
+        style={{ background: 'linear-gradient(135deg, #f5f3ff 0%, #fdf4ff 50%, #fce7f3 100%)' }}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-center gap-10">
+            {/* Left */}
+            <div className="flex-1">
+              <span className="inline-block px-4 py-1.5 rounded-full border border-purple-200 text-sm font-semibold text-purple-700 bg-purple-50 mb-5">
+                Oltre 500 Prodotti
+              </span>
+              <h1 className="text-4xl lg:text-6xl font-black leading-tight mb-5 text-gray-900">
+                Gadget Tech per{' '}
+                <span className="text-gradient block lg:inline">Ogni Esigenza</span>
+              </h1>
+              <p className="text-gray-500 text-lg mb-8 max-w-md leading-relaxed">
+                Scopri la migliore selezione di accessori tech, smart home e gaming a prezzi imbattibili.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <button
+                  onClick={() => setLocation('/prodotti')}
+                  className="btn-gradient px-8 py-3.5 rounded-full text-base font-bold shadow-lg hover:shadow-purple-300 transition-all"
+                >
+                  Scopri i Prodotti
+                </button>
+                <button
+                  onClick={() => setLocation('/offerte')}
+                  className="px-8 py-3.5 rounded-full text-base font-bold border-2 border-purple-600 text-purple-600 hover:bg-purple-50 transition-all"
+                >
+                  Offerte Speciali
+                </button>
+              </div>
+            </div>
+
+            {/* Right image */}
+            <div className="flex-1 flex justify-center">
+              <div className="w-72 h-72 lg:w-96 lg:h-96 rounded-3xl overflow-hidden shadow-2xl" style={{ background: '#FFD700' }}>
+                <img
+                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80"
+                  alt="Gadget Tech"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Categories */}
-      <section className="py-20 bg-muted/30">
+      {/* Benefits strip */}
+      <section className="border-b border-gray-100 py-8 bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold mb-3">Categorie Popolari</h2>
-              <p className="text-muted-foreground">Tutto quello che serve per il tuo ecosistema digitale.</p>
-            </div>
-            <Button variant="link" className="text-primary font-semibold hidden md:flex" asChild>
-              <Link href="/prodotti">Vedi tutte <ArrowRight className="ml-1 w-4 h-4" /></Link>
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.map((cat) => (
-              <Link key={cat.id} href={`/prodotti?category=${cat.id}`} className="group">
-                <div className="bg-card border border-border/50 rounded-xl p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-xl hover:border-primary/50 hover:-translate-y-1">
-                  <div className="bg-muted p-4 rounded-full mb-4 group-hover:bg-primary/10 transition-colors">
-                    {cat.icon}
-                  </div>
-                  <h3 className="font-display font-bold text-xl mb-2">{cat.name}</h3>
-                  <p className="text-sm text-muted-foreground">{cat.desc}</p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: '🚛', title: 'Spedizione Gratis', sub: 'Ordini sopra €49' },
+              { icon: '🔄', title: 'Reso Facile', sub: '30 giorni' },
+              { icon: '✅', title: 'Qualità Garantita', sub: 'Prodotti certificati' },
+              { icon: '📞', title: 'Assistenza', sub: '095 8998538' },
+            ].map(({ icon, title, sub }) => (
+              <div key={title} className="flex items-center gap-3">
+                <span className="text-3xl">{icon}</span>
+                <div>
+                  <p className="font-bold text-gray-900 text-sm">{title}</p>
+                  <p className="text-xs text-gray-500">{sub}</p>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
-          
-          <Button variant="outline" className="w-full mt-6 md:hidden" asChild>
-            <Link href="/prodotti">Vedi tutte le categorie</Link>
-          </Button>
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-20">
+      {/* Categorie */}
+      <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">In Evidenza</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">I prodotti più scelti dalla nostra community di appassionati tech.</p>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl lg:text-3xl font-black text-gray-900">Categorie</h2>
+            <Link href="/prodotti" className="font-semibold text-sm flex items-center gap-1" style={{ color: '#7c3aed' }}>
+              Vedi tutte <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {categoriesData?.length ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {categoriesData.map(cat => (
+                <Link
+                  key={cat.name}
+                  href={`/prodotti?category=${encodeURIComponent(cat.name)}`}
+                  className="flex flex-col items-center text-center p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-200 transition-all group"
+                >
+                  <span className="text-4xl mb-2">{getEmoji(cat.name)}</span>
+                  <p className="font-semibold text-gray-800 text-sm leading-tight">{cat.name}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{cat.count} prodotti</p>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+              {[
+                { name: 'Accessori Computer', emoji: '💻' },
+                { name: 'Accessori Gaming', emoji: '🎮' },
+                { name: 'Accessori Smartphone', emoji: '📱' },
+                { name: 'Audio e Cuffie', emoji: '🎧' },
+                { name: 'Caricatori e Powerbank', emoji: '🔋' },
+                { name: 'Cavi e Adattatori', emoji: '🔌' },
+              ].map(cat => (
+                <div
+                  key={cat.name}
+                  className="flex flex-col items-center text-center p-4 bg-white border border-gray-100 rounded-2xl shadow-sm animate-pulse"
+                >
+                  <span className="text-4xl mb-2">{cat.emoji}</span>
+                  <p className="font-semibold text-gray-400 text-sm">{cat.name}</p>
+                  <p className="text-xs text-gray-300 mt-0.5">— prodotti</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Prodotti in Evidenza */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-black text-gray-900">Prodotti in Evidenza</h2>
+              <p className="text-gray-500 text-sm mt-1">I gadget più amati dai nostri clienti</p>
+            </div>
+            <Link href="/prodotti" className="font-semibold text-sm flex items-center gap-1 mt-1" style={{ color: '#7c3aed' }}>
+              Vedi tutti <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
           {isFeaturedLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="h-80 bg-muted animate-pulse rounded-xl" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="h-72 bg-gray-200 animate-pulse rounded-2xl" />
               ))}
             </div>
           ) : featuredProducts?.length ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {featuredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">Nessun prodotto in evidenza al momento.</div>
+            <p className="text-center text-gray-400 py-10">Nessun prodotto in evidenza al momento.</p>
           )}
         </div>
       </section>
 
-      {/* Promo Banner */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="bg-primary rounded-3xl overflow-hidden relative shadow-2xl">
-            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center mix-blend-multiply opacity-20" />
-            <div className="relative z-10 p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8 text-primary-foreground">
-              <div className="max-w-xl text-center md:text-left">
-                <Shield className="w-12 h-12 mb-6 mx-auto md:mx-0 opacity-80" />
-                <h2 className="text-3xl md:text-5xl font-display font-black mb-4">Garanzia Alpha Bit</h2>
-                <p className="text-primary-foreground/80 text-lg mb-8">
-                  Tutti i nostri prodotti sono testati e garantiti. Se non sei soddisfatto, hai 30 giorni per restituire il tuo ordine senza fare domande.
-                </p>
-                <Button size="lg" variant="secondary" className="font-bold rounded-full text-primary" asChild>
-                  <Link href="/chi-siamo">Scopri di più su di noi</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Special Offers */}
-      {(!isOffersLoading && offerProducts?.length! > 0) && (
-        <section className="py-20 bg-muted/30">
+      {/* Offerte Flash */}
+      {(!isOffersLoading && offerProducts && offerProducts.length > 0) && (
+        <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <div className="flex items-center gap-3">
-                <div className="bg-destructive/10 text-destructive p-2 rounded-md">
-                  <Zap className="w-6 h-6" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-display font-bold">Offerte Flash</h2>
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h2 className="text-2xl lg:text-3xl font-black text-gray-900">🔥 Offerte Flash</h2>
+                <p className="text-gray-500 text-sm mt-1">Prezzi speciali per un tempo limitato</p>
               </div>
-              <Button variant="outline" asChild>
-                <Link href="/offerte">Vedi tutte</Link>
-              </Button>
+              <Link href="/offerte" className="font-semibold text-sm flex items-center gap-1 mt-1" style={{ color: '#7c3aed' }}>
+                Vedi tutte <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {offerProducts!.map(product => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {offerProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

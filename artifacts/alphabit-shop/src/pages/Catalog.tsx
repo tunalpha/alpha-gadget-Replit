@@ -114,22 +114,28 @@ export default function Catalog() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="container mx-auto px-4 py-6">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 mb-4">
+        <a href="/" className="text-sm font-semibold flex items-center gap-1" style={{ color: '#7c3aed' }}>
+          ← Torna alla Home
+        </a>
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-display font-bold">Catalogo Prodotti</h1>
+          <h1 className="text-3xl font-black text-gray-900">Tutti i Prodotti</h1>
           {hasActiveFilters && (
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-sm text-muted-foreground">Filtri attivi:</span>
-              {category && <span className="inline-flex items-center text-xs bg-muted px-2 py-1 rounded-full">{category}</span>}
-              {searchQuery && <span className="inline-flex items-center text-xs bg-muted px-2 py-1 rounded-full">"{searchQuery}"</span>}
-              <Button variant="ghost" size="sm" onClick={clearFilters} className="h-6 px-2 text-xs text-destructive">
-                Rimuovi <X className="w-3 h-3 ml-1" />
-              </Button>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              {category && <span className="inline-flex items-center text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-medium">{category}</span>}
+              {searchQuery && <span className="inline-flex items-center text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-medium">"{searchQuery}"</span>}
+              <button onClick={clearFilters} className="text-xs text-red-500 hover:underline flex items-center gap-1">
+                <X className="w-3 h-3" /> Rimuovi filtri
+              </button>
             </div>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2 w-full md:w-auto">
           <Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
             <SheetTrigger asChild>
@@ -146,7 +152,7 @@ export default function Catalog() {
           </Sheet>
 
           <Select value={sort} onValueChange={setSort}>
-            <SelectTrigger className="w-full md:w-[200px]">
+            <SelectTrigger className="w-full md:w-[200px] rounded-full border-gray-200">
               <SelectValue placeholder="Ordina per" />
             </SelectTrigger>
             <SelectContent>
@@ -161,46 +167,50 @@ export default function Catalog() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-8">
         {/* Desktop Sidebar */}
-        <aside className="hidden md:block col-span-1 border-r border-border/50 pr-6">
-          <form onSubmit={handleSearch} className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Cerca..." 
-              className="pl-9"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-            />
-          </form>
-          <FiltersContent />
+        <aside className="hidden md:block col-span-1">
+          <div className="bg-white rounded-2xl border border-gray-100 p-4 sticky top-32">
+            <form onSubmit={handleSearch} className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Cerca..."
+                className="pl-9 rounded-full border-gray-200"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+              />
+            </form>
+            <FiltersContent />
+          </div>
         </aside>
 
         {/* Product Grid */}
         <main className="md:col-span-3 lg:col-span-4">
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="h-80 bg-muted animate-pulse rounded-xl" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="h-72 bg-gray-100 animate-pulse rounded-2xl" />
               ))}
             </div>
           ) : products.length > 0 ? (
             <>
-              <div className="text-sm text-muted-foreground mb-4">
-                Trovati <span className="font-bold text-foreground">{products.length}</span> prodotti
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <p className="text-sm text-gray-500 mb-4">
+                <span className="font-bold text-gray-900">{products.length}</span> prodotti trovati
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {products.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             </>
           ) : (
-            <div className="text-center py-20 bg-muted/20 rounded-2xl border border-dashed border-border/50">
-              <Search className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-xl font-display font-semibold mb-2">Nessun prodotto trovato</h3>
-              <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                Non abbiamo trovato prodotti che corrispondono ai tuoi criteri di ricerca. Prova a rimuovere qualche filtro.
+            <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+              <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-700 mb-2">Nessun prodotto trovato</h3>
+              <p className="text-gray-400 max-w-md mx-auto mb-6 text-sm">
+                Prova a rimuovere qualche filtro.
               </p>
-              <Button onClick={clearFilters}>Pulisci filtri</Button>
+              <button onClick={clearFilters} className="btn-gradient px-6 py-2.5 rounded-full text-sm font-bold">
+                Pulisci filtri
+              </button>
             </div>
           )}
         </main>
