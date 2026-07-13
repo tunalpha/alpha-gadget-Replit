@@ -4,7 +4,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import App from './App';
 import './index.css';
 
-// Configure API client auth — reads JWT from localStorage on every request
 setAuthTokenGetter(() => localStorage.getItem('token'));
 
 const rootEl = document.getElementById('root');

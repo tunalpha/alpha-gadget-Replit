@@ -1,0 +1,2 @@
+- [Wouter v3 routing](wouter-routing.md) — nested Switch with `/:rest*` doesn't match root `/`; use location.startsWith() to split admin vs store instead.
+- [Alpha Bit Shop stack](alphabit-shop-stack.md) — full stack decisions, secrets, DB name, and routing architecture.

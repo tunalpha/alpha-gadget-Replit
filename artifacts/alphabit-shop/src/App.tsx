@@ -54,78 +54,51 @@ function ScrollToTop() {
   return null;
 }
 
-function Router() {
+function AdminRouter() {
   return (
-    <Switch>
-      {/* Admin Routes */}
-      <Route path="/admin">
-        {() => (
-          <AdminLayout>
-            <AdminDashboard />
-          </AdminLayout>
-        )}
-      </Route>
-      <Route path="/admin/ordini">
-        {() => (
-          <AdminLayout>
-            <AdminOrders />
-          </AdminLayout>
-        )}
-      </Route>
-      <Route path="/admin/prodotti">
-        {() => (
-          <AdminLayout>
-            <AdminProducts />
-          </AdminLayout>
-        )}
-      </Route>
-      <Route path="/admin/clienti">
-        {() => (
-          <AdminLayout>
-            <AdminCustomers />
-          </AdminLayout>
-        )}
-      </Route>
-      <Route path="/admin/offerte">
-        {() => (
-          <AdminLayout>
-            <AdminOffers />
-          </AdminLayout>
-        )}
-      </Route>
-
-      {/* Public Storefront Routes */}
-      <Route path="/:rest*">
-        {() => (
-          <AppLayout>
-            <Switch>
-              <Route path="/" component={Home} />
-              <Route path="/prodotti" component={Catalog} />
-              <Route path="/prodotto/:id" component={ProductDetail} />
-              <Route path="/offerte" component={Offers} />
-              <Route path="/carrello" component={Cart} />
-              <Route path="/checkout" component={Checkout} />
-              <Route path="/order-success/:id" component={OrderSuccess} />
-              
-              <Route path="/chi-siamo" component={About} />
-              <Route path="/contatti" component={Contact} />
-              <Route path="/spedizioni" component={Shipping} />
-              <Route path="/resi-rimborsi" component={Returns} />
-              <Route path="/privacy-policy" component={Privacy} />
-              
-              <Route path="/login" component={Login} />
-              <Route path="/registrati" component={Register} />
-              <Route path="/password-dimenticata" component={ForgotPassword} />
-              <Route path="/reset-password" component={ResetPassword} />
-              <Route path="/account" component={Account} />
-              
-              <Route component={NotFound} />
-            </Switch>
-          </AppLayout>
-        )}
-      </Route>
-    </Switch>
+    <AdminLayout>
+      <Switch>
+        <Route path="/admin/ordini" component={AdminOrders} />
+        <Route path="/admin/prodotti" component={AdminProducts} />
+        <Route path="/admin/clienti" component={AdminCustomers} />
+        <Route path="/admin/offerte" component={AdminOffers} />
+        <Route component={AdminDashboard} />
+      </Switch>
+    </AdminLayout>
   );
+}
+
+function StoreRouter() {
+  return (
+    <AppLayout>
+      <Switch>
+        <Route path="/prodotti" component={Catalog} />
+        <Route path="/prodotto/:id" component={ProductDetail} />
+        <Route path="/offerte" component={Offers} />
+        <Route path="/carrello" component={Cart} />
+        <Route path="/checkout" component={Checkout} />
+        <Route path="/order-success/:id" component={OrderSuccess} />
+        <Route path="/chi-siamo" component={About} />
+        <Route path="/contatti" component={Contact} />
+        <Route path="/spedizioni" component={Shipping} />
+        <Route path="/resi-rimborsi" component={Returns} />
+        <Route path="/privacy-policy" component={Privacy} />
+        <Route path="/login" component={Login} />
+        <Route path="/registrati" component={Register} />
+        <Route path="/password-dimenticata" component={ForgotPassword} />
+        <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/account" component={Account} />
+        <Route path="/" component={Home} />
+        <Route component={NotFound} />
+      </Switch>
+    </AppLayout>
+  );
+}
+
+function Router() {
+  const [location] = useLocation();
+  const isAdmin = location.startsWith('/admin');
+  return isAdmin ? <AdminRouter /> : <StoreRouter />;
 }
 
 function App() {
@@ -134,7 +107,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <TooltipProvider>
-            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+            <WouterRouter base="">
               <ScrollToTop />
               <Router />
             </WouterRouter>

@@ -2,7 +2,7 @@ import { MongoClient, Db, ObjectId } from "mongodb";
 import { logger } from "./logger";
 
 const MONGO_URL = process.env["MONGO_URL"];
-const DB_NAME = process.env["DB_NAME"] || "alphabit_gadget";
+const DB_NAME = process.env["DB_NAME"] || "alphabit_shop_replit";
 
 if (!MONGO_URL) {
   throw new Error("MONGO_URL must be set");
