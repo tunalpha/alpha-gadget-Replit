@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatPrice } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function AdminOrders() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -19,14 +21,28 @@ export default function AdminOrders() {
     try {
       await updateStatus.mutateAsync({ 
         orderId,
-        data: {
-          status: newStatus
-        }
+        data: { status: newStatus }
       });
-      toast.success("Stato ordine aggiornato");
+      toast.success("Stato aggiornato — email inviata al cliente");
       refetch();
     } catch (error) {
       toast.error("Errore durante l'aggiornamento");
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm("Eliminare definitivamente questo ordine?")) return;
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      toast.success("Ordine eliminato");
+      refetch();
+    } catch {
+      toast.error("Errore nell'eliminazione");
     }
   };
 
@@ -86,18 +102,28 @@ export default function AdminOrders() {
                       <div className="font-bold">{formatPrice(order.total)}</div>
                     </div>
                   </div>
-                  <Select defaultValue={order.status} onValueChange={(val) => handleStatusChange(order.id, val)}>
-                    <SelectTrigger className={`h-8 text-xs font-semibold uppercase tracking-wider border-none w-full ${statusColors[order.status]}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="processing">Processing</SelectItem>
-                      <SelectItem value="shipped">Shipped</SelectItem>
-                      <SelectItem value="delivered">Delivered</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <Select defaultValue={order.status} onValueChange={(val) => handleStatusChange(order.id, val)}>
+                      <SelectTrigger className={`h-8 text-xs font-semibold uppercase tracking-wider border-none flex-1 ${statusColors[order.status]}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="processing">Processing</SelectItem>
+                        <SelectItem value="shipped">Shipped</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:bg-destructive/10 shrink-0"
+                      onClick={() => handleDeleteOrder(order.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -148,6 +174,16 @@ export default function AdminOrders() {
                             <SelectItem value="cancelled">Cancelled</SelectItem>
                           </SelectContent>
                         </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                          onClick={() => handleDeleteOrder(order.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

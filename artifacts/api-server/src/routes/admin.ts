@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import { getDb, ObjectId, serializeDoc } from "../lib/mongo";
 import { adminMiddleware, AuthRequest } from "../lib/auth";
+import { sendOrderStatusEmail } from "../lib/mailer";
 
 const router = Router();
 const admin = adminMiddleware as Parameters<typeof router.get>[1];
@@ -89,9 +90,36 @@ router.put("/orders/:orderId/status", admin, async (req: AuthRequest, res: Respo
 
     await db.collection("orders").updateOne({ _id: new ObjectId(orderId) }, { $set: updates });
     const order = await db.collection("orders").findOne({ _id: new ObjectId(orderId) });
-    res.json(serializeDoc(order as Record<string, unknown>));
+    const ser = serializeDoc(order as Record<string, unknown>);
+    res.json(ser);
+
+    // Fire-and-forget email notification to customer
+    if (ser.customer_email && ser.customer_name) {
+      sendOrderStatusEmail({
+        to: ser.customer_email as string,
+        customerName: ser.customer_name as string,
+        orderId: ser.id as string,
+        status,
+        trackingNumber: tracking_number,
+        notes,
+      }).catch((e) => req.log?.error({ e }, "sendOrderStatusEmail failed"));
+    }
   } catch (err) {
     req.log?.error({ err }, "updateOrderStatus error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// ── DELETE ORDER ─────────────────────────────────────────────────────────────
+router.delete("/orders/:orderId", admin, async (req: AuthRequest, res: Response) => {
+  try {
+    const db = getDb();
+    const { orderId } = req.params;
+    const result = await db.collection("orders").deleteOne({ _id: new ObjectId(orderId) });
+    if (result.deletedCount === 0) return res.status(404).json({ error: "Ordine non trovato" }) as unknown as void;
+    res.json({ success: true });
+  } catch (err) {
+    req.log?.error({ err }, "deleteOrder error");
     res.status(500).json({ error: "Server error" });
   }
 });
