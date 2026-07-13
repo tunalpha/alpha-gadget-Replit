@@ -33,7 +33,7 @@ export default function AdminOrders() {
   const handleDeleteOrder = async (orderId: string) => {
     if (!confirm("Eliminare definitivamente questo ordine?")) return;
     try {
-      const token = localStorage.getItem("auth_token");
+      const token = localStorage.getItem("token");
       const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
