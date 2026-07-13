@@ -61,63 +61,100 @@ export default function AdminOrders() {
         </Select>
       </div>
 
-      <div className="bg-card border border-border/50 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-card border border-border/50 rounded-xl shadow-sm">
         {isLoading ? (
           <div className="p-8 text-center text-muted-foreground">Caricamento ordini...</div>
         ) : data?.orders && data.orders.length > 0 ? (
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead>ID Ordine</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Totale</TableHead>
-                <TableHead>Pagamento</TableHead>
-                <TableHead>Stato</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Mobile: card list */}
+            <div className="md:hidden divide-y divide-border/50">
               {data.orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium text-xs font-mono">
-                    {order.id.split('-')[0]}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {new Date(order.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm font-medium">{order.customer_name}</div>
-                    <div className="text-xs text-muted-foreground">{order.customer_email}</div>
-                  </TableCell>
-                  <TableCell className="font-bold">
-                    {formatPrice(order.total)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`capitalize ${order.payment_status === 'paid' ? 'border-green-500/30 text-green-600' : ''}`}>
+                <div key={order.id} className="p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-xs font-semibold">#{order.id.slice(0, 8)}</span>
+                    <Badge variant="outline" className={`capitalize text-xs shrink-0 ${order.payment_status === 'paid' ? 'border-green-500/30 text-green-600' : ''}`}>
                       {order.payment_status || 'pending'}
                     </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Select 
-                      defaultValue={order.status} 
-                      onValueChange={(val) => handleStatusChange(order.id, val)}
-                    >
-                      <SelectTrigger className={`h-8 text-xs font-semibold uppercase tracking-wider border-none ${statusColors[order.status]}`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="processing">Processing</SelectItem>
-                        <SelectItem value="shipped">Shipped</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                </TableRow>
+                  </div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium truncate">{order.customer_name}</div>
+                      <div className="text-xs text-muted-foreground truncate">{order.customer_email}</div>
+                      <div className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-bold">{formatPrice(order.total)}</div>
+                    </div>
+                  </div>
+                  <Select defaultValue={order.status} onValueChange={(val) => handleStatusChange(order.id, val)}>
+                    <SelectTrigger className={`h-8 text-xs font-semibold uppercase tracking-wider border-none w-full ${statusColors[order.status]}`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="processing">Processing</SelectItem>
+                      <SelectItem value="shipped">Shipped</SelectItem>
+                      <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+            {/* Desktop: table */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow>
+                    <TableHead>ID Ordine</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Totale</TableHead>
+                    <TableHead>Pagamento</TableHead>
+                    <TableHead>Stato</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.orders.map((order) => (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-medium text-xs font-mono">
+                        #{order.id.slice(0, 8)}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {new Date(order.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm font-medium">{order.customer_name}</div>
+                        <div className="text-xs text-muted-foreground">{order.customer_email}</div>
+                      </TableCell>
+                      <TableCell className="font-bold">
+                        {formatPrice(order.total)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={`capitalize ${order.payment_status === 'paid' ? 'border-green-500/30 text-green-600' : ''}`}>
+                          {order.payment_status || 'pending'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Select defaultValue={order.status} onValueChange={(val) => handleStatusChange(order.id, val)}>
+                          <SelectTrigger className={`h-8 text-xs font-semibold uppercase tracking-wider border-none ${statusColors[order.status]}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="processing">Processing</SelectItem>
+                            <SelectItem value="shipped">Shipped</SelectItem>
+                            <SelectItem value="delivered">Delivered</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         ) : (
           <div className="p-12 text-center text-muted-foreground">
             Nessun ordine trovato per i criteri selezionati.

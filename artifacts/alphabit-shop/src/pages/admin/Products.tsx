@@ -120,7 +120,7 @@ export default function AdminProducts() {
         </Button>
       </div>
 
-      <div className="bg-card border border-border/50 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-card border border-border/50 rounded-xl shadow-sm">
         <div className="p-4 border-b border-border/50 bg-muted/10">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -136,57 +136,92 @@ export default function AdminProducts() {
         {isLoading ? (
           <div className="p-8 text-center text-muted-foreground">Caricamento prodotti...</div>
         ) : data?.products && data.products.length > 0 ? (
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead className="w-[80px]">Img</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead className="text-right">Prezzo</TableHead>
-                <TableHead className="text-right">Stock</TableHead>
-                <TableHead className="text-right">Azioni</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Mobile: card list */}
+            <div className="md:hidden divide-y divide-border/50">
               {data.products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    <div className="w-10 h-10 bg-muted rounded p-1 flex items-center justify-center">
-                      {product.image ? (
-                        <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply" />
-                      ) : <span className="text-[10px] text-muted-foreground">N/A</span>}
+                <div key={product.id} className="p-3 flex items-center gap-3">
+                  <div className="w-12 h-12 bg-muted rounded p-1 flex items-center justify-center shrink-0">
+                    {product.image
+                      ? <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply" />
+                      : <span className="text-[10px] text-muted-foreground">N/A</span>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm truncate">{product.name}</div>
+                    <div className="text-xs text-muted-foreground">{product.sku || 'No SKU'}</div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="font-bold text-sm">{formatPrice(product.price)}</span>
+                      <Badge variant={product.stock > 10 ? 'default' : product.stock > 0 ? 'secondary' : 'destructive'} className="text-[10px]">
+                        {product.stock} pz
+                      </Badge>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-semibold line-clamp-1">{product.name}</div>
-                    <div className="text-xs text-muted-foreground">{product.sku || 'Nessun SKU'}</div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="uppercase text-[10px]">{product.category}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="font-bold">{formatPrice(product.price)}</div>
-                    {product.on_sale && product.sale_price && (
-                      <div className="text-xs text-destructive font-medium">Sale: {formatPrice(product.sale_price)}</div>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={product.stock > 10 ? 'default' : product.stock > 0 ? 'secondary' : 'destructive'} className="bg-opacity-20">
-                      {product.stock}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => openModal(product)}>
+                  </div>
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openModal(product)}>
                       <Edit2 className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(product.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => handleDelete(product.id)}>
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                  </TableCell>
-                </TableRow>
+                  </div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+            {/* Desktop: table */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow>
+                    <TableHead className="w-[80px]">Img</TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Categoria</TableHead>
+                    <TableHead className="text-right">Prezzo</TableHead>
+                    <TableHead className="text-right">Stock</TableHead>
+                    <TableHead className="text-right">Azioni</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.products.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <div className="w-10 h-10 bg-muted rounded p-1 flex items-center justify-center">
+                          {product.image ? (
+                            <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain mix-blend-multiply" />
+                          ) : <span className="text-[10px] text-muted-foreground">N/A</span>}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-semibold line-clamp-1">{product.name}</div>
+                        <div className="text-xs text-muted-foreground">{product.sku || 'Nessun SKU'}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="uppercase text-[10px]">{product.category}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="font-bold">{formatPrice(product.price)}</div>
+                        {product.on_sale && product.sale_price && (
+                          <div className="text-xs text-destructive font-medium">Sale: {formatPrice(product.sale_price)}</div>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Badge variant={product.stock > 10 ? 'default' : product.stock > 0 ? 'secondary' : 'destructive'} className="bg-opacity-20">
+                          {product.stock}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" onClick={() => openModal(product)}>
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(product.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         ) : (
           <div className="p-12 text-center text-muted-foreground">
             Nessun prodotto trovato.

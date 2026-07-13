@@ -60,42 +60,66 @@ export default function AdminCustomers() {
         {isLoading ? (
           <div className="p-8 text-center text-muted-foreground">Caricamento clienti...</div>
         ) : customersData?.customers && customersData.customers.length > 0 ? (
-          <Table>
-            <TableHeader className="bg-muted/30">
-              <TableRow>
-                <TableHead>Cliente</TableHead>
-                <TableHead>Contatti</TableHead>
-                <TableHead>Data Registrazione</TableHead>
-                <TableHead className="text-right">Ordini</TableHead>
-                <TableHead className="text-right">Totale Speso</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Mobile: card list */}
+            <div className="md:hidden divide-y divide-border/50">
               {customersData.customers.map((customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell>
-                    <div className="font-semibold">{customer.name}</div>
+                <div key={customer.id} className="p-4 space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="font-semibold truncate">{customer.name}</div>
                     {customer.tags && customer.tags.includes('vip') && (
-                      <Badge className="bg-yellow-500 hover:bg-yellow-600 mt-1">VIP</Badge>
+                      <Badge className="bg-yellow-500 hover:bg-yellow-600 shrink-0">VIP</Badge>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">{customer.email}</div>
-                    <div className="text-xs text-muted-foreground">{customer.phone || '-'}</div>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A'}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {customer.order_count}
-                  </TableCell>
-                  <TableCell className="text-right font-bold text-primary">
-                    {formatPrice(customer.total_spent)}
-                  </TableCell>
-                </TableRow>
+                  </div>
+                  <div className="text-sm text-muted-foreground truncate">{customer.email}</div>
+                  {customer.phone && <div className="text-xs text-muted-foreground">{customer.phone}</div>}
+                  <div className="flex items-center justify-between text-sm pt-1">
+                    <span className="text-muted-foreground">{customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A'}</span>
+                    <span className="font-bold text-primary">{formatPrice(customer.total_spent)}</span>
+                  </div>
+                </div>
               ))}
-            </TableBody>
-          </Table>
+            </div>
+            {/* Desktop: table */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Contatti</TableHead>
+                    <TableHead>Data Registrazione</TableHead>
+                    <TableHead className="text-right">Ordini</TableHead>
+                    <TableHead className="text-right">Totale Speso</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {customersData.customers.map((customer) => (
+                    <TableRow key={customer.id}>
+                      <TableCell>
+                        <div className="font-semibold">{customer.name}</div>
+                        {customer.tags && customer.tags.includes('vip') && (
+                          <Badge className="bg-yellow-500 hover:bg-yellow-600 mt-1">VIP</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">{customer.email}</div>
+                        <div className="text-xs text-muted-foreground">{customer.phone || '-'}</div>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-right font-medium">
+                        {customer.order_count}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-primary">
+                        {formatPrice(customer.total_spent)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         ) : (
           <div className="p-12 text-center text-muted-foreground">
             Nessun cliente trovato.

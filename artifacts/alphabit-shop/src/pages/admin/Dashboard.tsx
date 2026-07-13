@@ -91,13 +91,13 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             {stats.recent_orders && stats.recent_orders.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {stats.recent_orders.slice(0, 5).map(order => (
-                  <div key={order.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border/50">
-                    <div>
-                      <div className="font-semibold flex items-center gap-2">
-                        #{order.id.split('-')[0]}
-                        <span className={`text-xs px-2 py-0.5 rounded uppercase tracking-wider font-bold ${
+                  <div key={order.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50 gap-2 min-w-0">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold flex items-center gap-2 flex-wrap">
+                        <span className="font-mono text-xs">#{order.id.slice(0, 8)}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded uppercase tracking-wider font-bold shrink-0 ${
                           order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-700' :
                           order.status === 'processing' ? 'bg-blue-500/20 text-blue-700' :
                           order.status === 'shipped' ? 'bg-purple-500/20 text-purple-700' :
@@ -106,10 +106,10 @@ export default function AdminDashboard() {
                           {order.status}
                         </span>
                       </div>
-                      <div className="text-sm text-muted-foreground mt-1">{order.customer_name}</div>
+                      <div className="text-sm text-muted-foreground mt-1 truncate">{order.customer_name}</div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-bold text-lg">{formatPrice(order.total)}</div>
+                    <div className="text-right shrink-0">
+                      <div className="font-bold">{formatPrice(order.total)}</div>
                       <div className="text-xs text-muted-foreground">{new Date(order.created_at).toLocaleDateString()}</div>
                     </div>
                   </div>
