@@ -194,56 +194,97 @@ export default function AdminProducts() {
         )}
       </div>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingId ? 'Modifica Prodotto' : 'Nuovo Prodotto'}</DialogTitle>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField control={form.control} name="name" render={({field}) => (
-                  <FormItem className="col-span-2"><FormLabel>Nome</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
-                )} />
-                <FormField control={form.control} name="category" render={({field}) => (
-                  <FormItem>
-                    <FormLabel>Categoria</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Seleziona" /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="cavi">Cavi & Adattatori</SelectItem>
-                        <SelectItem value="audio">Audio & Cuffie</SelectItem>
-                        <SelectItem value="powerbank">Powerbank & Ricarica</SelectItem>
-                        <SelectItem value="periferiche">Mouse & Tastiere</SelectItem>
-                        <SelectItem value="memorie">Memorie & SSD</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="sku" render={({field}) => (
-                  <FormItem><FormLabel>SKU</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
-                )} />
-                <FormField control={form.control} name="price" render={({field}) => (
-                  <FormItem><FormLabel>Prezzo Base (€)</FormLabel><FormControl><Input type="number" step="0.01" {...field} /></FormControl></FormItem>
-                )} />
-                <FormField control={form.control} name="stock" render={({field}) => (
-                  <FormItem><FormLabel>Disponibilità</FormLabel><FormControl><Input type="number" {...field} /></FormControl></FormItem>
-                )} />
-                <FormField control={form.control} name="image" render={({field}) => (
-                  <FormItem className="col-span-2"><FormLabel>URL Immagine</FormLabel><FormControl><Input {...field} /></FormControl></FormItem>
-                )} />
-                <FormField control={form.control} name="description" render={({field}) => (
-                  <FormItem className="col-span-2"><FormLabel>Descrizione Lunga</FormLabel><FormControl><Textarea rows={4} {...field} /></FormControl></FormItem>
-                )} />
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Annulla</Button>
-                <Button type="submit" disabled={createMutation.isPending}>Salva Prodotto</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      {isModalOpen && (
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editingId ? 'Modifica Prodotto' : 'Nuovo Prodotto'}</DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField control={form.control} name="name" render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Nome</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="category" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Categoria</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="Seleziona" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Cavi e Adattatori">Cavi & Adattatori</SelectItem>
+                          <SelectItem value="Audio e Cuffie">Audio & Cuffie</SelectItem>
+                          <SelectItem value="Caricatori e Powerbank">Powerbank & Ricarica</SelectItem>
+                          <SelectItem value="Accessori Computer">Accessori Computer</SelectItem>
+                          <SelectItem value="Accessori Smartphone">Accessori Smartphone</SelectItem>
+                          <SelectItem value="Accessori Gaming">Accessori Gaming</SelectItem>
+                          <SelectItem value="Smart Home">Smart Home</SelectItem>
+                          <SelectItem value="Fotografia e Video">Fotografia e Video</SelectItem>
+                          <SelectItem value="Organizzazione e Viaggio">Organizzazione e Viaggio</SelectItem>
+                          <SelectItem value="Wearable e Fitness">Wearable e Fitness</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="sku" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>SKU</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="price" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prezzo Base (€)</FormLabel>
+                      <FormControl><Input type="number" step="0.01" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="sale_price" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Prezzo Scontato (€)</FormLabel>
+                      <FormControl><Input type="number" step="0.01" placeholder="Lascia vuoto se nessuno sconto" value={field.value ?? ''} onChange={e => field.onChange(e.target.value === '' ? null : parseFloat(e.target.value))} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="stock" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Disponibilità</FormLabel>
+                      <FormControl><Input type="number" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="image" render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>URL Immagine</FormLabel>
+                      <FormControl><Input {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={form.control} name="description" render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Descrizione</FormLabel>
+                      <FormControl><Textarea rows={4} {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Annulla</Button>
+                  <Button type="submit" disabled={createMutation.isPending}>Salva Prodotto</Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

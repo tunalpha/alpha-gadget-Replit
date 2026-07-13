@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
-import { LayoutDashboard, ShoppingBag, Package, Tag, Users, LogOut, ArrowLeft, Cpu } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Tag, Users, LogOut, ArrowLeft, Cpu, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AdminLayoutProps {
@@ -11,6 +11,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location, setLocation] = useLocation();
   const { user, logout } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!user || user.role !== 'admin') {
     setLocation('/login');
@@ -21,75 +22,122 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/ordini', label: 'Ordini', icon: ShoppingBag },
     { href: '/admin/prodotti', label: 'Prodotti', icon: Package },
-    { href: '/admin/offerte', label: 'Coupon & Offerte', icon: Tag },
+    { href: '/admin/offerte', label: 'Coupon', icon: Tag },
     { href: '/admin/clienti', label: 'Clienti', icon: Users },
   ];
 
-  return (
-    <div className="min-h-screen bg-muted/20 flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shrink-0 flex flex-col h-auto md:min-h-screen sticky top-0">
-        <div className="p-6 border-b border-sidebar-border/50 flex items-center justify-between md:justify-start gap-4">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary text-primary-foreground p-1.5 rounded-md">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <span className="font-display font-bold text-xl tracking-tight">Admin</span>
-          </div>
-          <Button variant="ghost" size="sm" className="md:hidden text-sidebar-foreground" asChild>
-            <Link href="/">Esci</Link>
-          </Button>
-        </div>
+  const isActive = (href: string) =>
+    href === '/admin' ? location === '/admin' : location.startsWith(href);
 
-        <nav className="flex-1 p-4 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible">
-          {navItems.map((item) => {
-            const isActive = location === item.href || (item.href !== '/admin' && location.startsWith(item.href));
-            const Icon = item.icon;
-            
-            return (
-              <Link 
-                key={item.href} 
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors whitespace-nowrap ${
-                  isActive 
-                    ? 'bg-sidebar-primary text-sidebar-primary-foreground font-medium' 
-                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                }`}
-              >
-                <Icon className="w-5 h-5 shrink-0" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-sidebar-border/50 hidden md:flex flex-col gap-2">
-          <Button variant="outline" className="w-full justify-start bg-transparent border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" asChild>
-            <Link href="/"><ArrowLeft className="w-4 h-4 mr-2" /> Torna al Negozio</Link>
-          </Button>
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive"
-            onClick={() => {
-              logout();
-              setLocation('/');
-            }}
+  const NavLinks = ({ onNav }: { onNav?: () => void }) => (
+    <>
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const active = isActive(item.href);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNav}
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              active
+                ? 'bg-primary text-white font-semibold'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+            }`}
           >
-            <LogOut className="w-4 h-4 mr-2" /> Disconnetti
-          </Button>
+            <Icon className="w-5 h-5 shrink-0" />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+
+      {/* ── MOBILE TOPBAR ─────────────────────────────── */}
+      <header className="md:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 h-14 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="bg-primary text-white p-1.5 rounded-md">
+            <Cpu className="w-4 h-4" />
+          </div>
+          <span className="font-bold text-lg">Admin</span>
+        </div>
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+          aria-label="Menu"
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </header>
+
+      {/* ── MOBILE DRAWER ─────────────────────────────── */}
+      {mobileOpen && (
+        <div className="md:hidden fixed inset-0 z-20 flex">
+          {/* backdrop */}
+          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+          {/* panel */}
+          <nav className="relative w-72 bg-white h-full flex flex-col shadow-xl">
+            <div className="p-4 border-b border-gray-100 flex items-center gap-2">
+              <div className="bg-primary text-white p-1.5 rounded-md">
+                <Cpu className="w-4 h-4" />
+              </div>
+              <span className="font-bold text-lg">Admin</span>
+            </div>
+            <div className="flex-1 p-3 space-y-1 overflow-y-auto">
+              <NavLinks onNav={() => setMobileOpen(false)} />
+            </div>
+            <div className="p-3 border-t border-gray-100 space-y-1">
+              <Link
+                href="/"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100"
+              >
+                <ArrowLeft className="w-5 h-5" /> Torna al Negozio
+              </Link>
+              <button
+                onClick={() => { logout(); setLocation('/'); }}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 w-full text-left"
+              >
+                <LogOut className="w-5 h-5" /> Disconnetti
+              </button>
+            </div>
+          </nav>
+        </div>
+      )}
+
+      {/* ── DESKTOP SIDEBAR ───────────────────────────── */}
+      <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 flex-col min-h-screen sticky top-0">
+        <div className="p-6 border-b border-gray-100 flex items-center gap-2">
+          <div className="bg-primary text-white p-1.5 rounded-md">
+            <Cpu className="w-5 h-5" />
+          </div>
+          <span className="font-bold text-xl">Admin</span>
+        </div>
+        <nav className="flex-1 p-3 space-y-1">
+          <NavLinks />
+        </nav>
+        <div className="p-3 border-t border-gray-100 space-y-1">
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" /> Torna al Negozio
+          </Link>
+          <button
+            onClick={() => { logout(); setLocation('/'); }}
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 w-full text-left text-sm"
+          >
+            <LogOut className="w-4 h-4" /> Disconnetti
+          </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border/50 bg-background flex items-center px-8 sticky top-0 z-10 md:hidden">
-           <Button variant="ghost" size="sm" asChild>
-            <Link href="/"><ArrowLeft className="w-4 h-4 mr-2" /> Torna al Negozio</Link>
-          </Button>
-        </header>
-        <div className="p-4 md:p-8 flex-1">
-          {children}
-        </div>
+      {/* ── MAIN CONTENT ──────────────────────────────── */}
+      <main className="flex-1 min-w-0 p-4 md:p-8">
+        {children}
       </main>
     </div>
   );

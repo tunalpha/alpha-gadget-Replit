@@ -191,7 +191,7 @@ export function Navbar() {
             {user ? (
               <>
                 <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="py-2.5 px-2 text-sm font-semibold text-gray-700">Il mio account</Link>
-                <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="py-2.5 px-2 text-sm font-semibold text-red-600 text-left">Esci</button>
+                <button onClick={() => { logout(); setIsMobileMenuOpen(false); setLocation('/'); }} className="py-2.5 px-2 text-sm font-semibold text-red-600 text-left">Esci</button>
               </>
             ) : (
               <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="py-2.5 px-2 text-sm font-semibold text-purple-700">Accedi</Link>
