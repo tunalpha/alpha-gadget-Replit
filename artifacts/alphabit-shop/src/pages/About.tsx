@@ -24,13 +24,13 @@ export default function About() {
               <h2 className="text-3xl font-display font-bold mb-6">Da un piccolo garage al tuo ecosistema tech</h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Alpha Bit è nata nel 2018 a Milano dalla passione di tre amici per l'hardware e i gadget tecnologici. Stanchi di dover scegliere tra componenti costosi di brand blasonati e prodotti economici di dubbia qualità, abbiamo deciso di creare la nostra selezione.
+                  Alpha Bit Gadget nasce a Catania dalla passione per la tecnologia e dal desiderio di offrire a tutti gadget e accessori tech di qualità a prezzi onesti. Stanchi di dover scegliere tra prodotti costosi di brand blasonati e articoli economici di dubbia qualità, abbiamo deciso di creare la nostra selezione curata.
                 </p>
                 <p>
-                  Abbiamo iniziato testando personalmente ogni singolo cavo, caricatore e powerbank nel nostro piccolo laboratorio, selezionando solo quelli che superavano i nostri rigidi standard di qualità e durabilità.
+                  Ogni prodotto nel nostro catalogo viene selezionato con cura, testato e scelto per garantire il miglior rapporto qualità-prezzo. Dalla Sicilia, serviamo clienti in tutta Italia con spedizioni rapide e un'assistenza clienti sempre disponibile.
                 </p>
                 <p>
-                  Oggi, Alpha Bit è un punto di riferimento per migliaia di utenti in tutta Italia che cercano accessori tech dal design curato e dalle prestazioni impeccabili.
+                  Oggi Alpha Bit Gadget è il punto di riferimento per chi cerca accessori smartphone, audio, gaming, smart home e molto altro — tutto in un unico shop di fiducia.
                 </p>
               </div>
             </div>

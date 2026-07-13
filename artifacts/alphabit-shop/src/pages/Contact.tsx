@@ -62,10 +62,10 @@ export default function Contact() {
                 <MapPin className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold mb-1">Sede Principale</h3>
+                <h3 className="font-bold mb-1">Sede</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Via Roma 123<br />
-                  20100 Milano (MI)<br />
+                  Via Ferrante Aporti, 8<br />
+                  95123 Catania (CT)<br />
                   Italia
                 </p>
               </div>
@@ -79,10 +79,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-bold mb-1">Email</h3>
-                <p className="text-sm text-muted-foreground mb-1">Assistenza Clienti:</p>
-                <a href="mailto:support@alphabit.it" className="text-sm text-primary font-medium hover:underline">support@alphabit.it</a>
-                <p className="text-sm text-muted-foreground mt-2 mb-1">Info Commerciali:</p>
-                <a href="mailto:info@alphabit.it" className="text-sm text-primary font-medium hover:underline">info@alphabit.it</a>
+                <a href="mailto:alphabit.sbs@gmail.com" className="text-sm text-primary font-medium hover:underline">alphabit.sbs@gmail.com</a>
               </div>
             </CardContent>
           </Card>
@@ -94,8 +91,7 @@ export default function Contact() {
               </div>
               <div>
                 <h3 className="font-bold mb-1">Telefono</h3>
-                <p className="text-sm text-muted-foreground mb-1">Numero Verde:</p>
-                <p className="text-sm font-medium">800 123 456</p>
+                <a href="tel:0958998538" className="text-sm font-medium hover:text-primary transition-colors">095 8998538</a>
               </div>
             </CardContent>
           </Card>
@@ -111,6 +107,10 @@ export default function Contact() {
                   Lunedì - Venerdì:<br />
                   09:00 - 18:00
                 </p>
+                <div className="mt-3 text-xs text-muted-foreground">
+                  <p><span className="font-semibold">P.IVA:</span> 05632770870</p>
+                  <p><span className="font-semibold">REA:</span> CT-418000</p>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -36,7 +36,7 @@ export default function Privacy() {
 
         <h2>4. I tuoi diritti (GDPR)</h2>
         <p>Se sei residente in Europa, hai il diritto di accedere alle informazioni personali che conserviamo su di te e di chiedere che vengano corrette, aggiornate o eliminate. Hai anche il diritto alla portabilità dei dati e il diritto di opporti a determinati trattamenti.</p>
-        <p>Per esercitare questi diritti, contattaci all'indirizzo email: privacy@alphabit.it.</p>
+        <p>Per esercitare questi diritti, contattaci all'indirizzo email: alphabit.sbs@gmail.com.</p>
 
         <h2>5. Conservazione dei dati</h2>
         <p>Quando effettui un ordine tramite il Sito, conserveremo le informazioni dell'ordine per i nostri archivi a meno che e fino a quando non ci chiedi di eliminare tali informazioni, fatto salvo l'obbligo di conservazione per fini fiscali e contabili previsto dalla legge italiana.</p>
@@ -44,9 +44,9 @@ export default function Privacy() {
         <h2>6. Contatti</h2>
         <p>Per maggiori informazioni sulle nostre pratiche in materia di privacy, se hai domande, o se desideri presentare un reclamo, ti preghiamo di contattarci via e-mail a privacy@alphabit.it o via posta a:</p>
         <address className="not-italic mt-4 p-4 bg-muted rounded-lg border border-border/50 text-foreground">
-          Alpha Bit Shop<br />
-          Via Roma 123<br />
-          20100 Milano (MI)<br />
+          Il Dattero di Giaquinta Enrico Maria<br />
+          Via Ferrante Aporti, 8<br />
+          95123 Catania (CT)<br />
           Italia
         </address>
       </div>
