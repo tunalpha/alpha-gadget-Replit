@@ -50,7 +50,7 @@ export function Navbar() {
       <div className="container mx-auto px-4 py-3 flex items-center gap-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-2xl font-black" style={{ color: '#7c3aed' }}>▲</span>
+          <img src="/logo.png" alt="Alpha Bit Gadget" className="h-9 w-9 object-contain" />
           <span className="font-black text-xl text-gray-900 leading-none">
             Alpha Bit <span style={{ color: '#7c3aed' }}>Gadget</span>
           </span>
