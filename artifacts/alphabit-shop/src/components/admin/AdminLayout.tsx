@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/hooks/use-auth';
-import { LayoutDashboard, ShoppingBag, Package, Tag, Users, LogOut, ArrowLeft, Cpu, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Tag, Users, LogOut, ArrowLeft, Cpu, Menu, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AdminLayoutProps {
@@ -10,8 +10,17 @@ interface AdminLayoutProps {
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location, setLocation] = useLocation();
-  const { user, logout } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Aspetta che il profilo sia caricato prima di reindirizzare
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     setLocation('/login');

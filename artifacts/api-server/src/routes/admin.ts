@@ -281,4 +281,20 @@ router.delete("/offers/:offerId", admin, async (req: AuthRequest, res: Response)
   }
 });
 
+// ── DELETE CUSTOMER ────────────────────────────────────────────────────────
+router.delete("/customers/:customerId", admin, async (req: AuthRequest, res: Response) => {
+  try {
+    const db = getDb();
+    const { customerId } = req.params;
+    const result = await db.collection("users").deleteOne({ _id: new ObjectId(customerId) });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Cliente non trovato" });
+    }
+    res.json({ message: "Cliente eliminato" });
+  } catch (err) {
+    req.log?.error({ err }, "deleteCustomer error");
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;

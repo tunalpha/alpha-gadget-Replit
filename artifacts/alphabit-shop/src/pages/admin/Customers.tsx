@@ -1,16 +1,34 @@
 import React, { useState } from 'react';
 import { useListAdminCustomers, useGetCrmStats } from '@workspace/api-client-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Search, UserCheck, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, UserCheck, Users, Trash2 } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 export default function AdminCustomers() {
   const [search, setSearch] = useState('');
   const { data: stats } = useGetCrmStats();
-  const { data: customersData, isLoading } = useListAdminCustomers({ search: search || undefined, limit: 50 });
+  const { data: customersData, isLoading, refetch } = useListAdminCustomers({ search: search || undefined, limit: 50 });
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Eliminare il cliente "${name}"? L'operazione è irreversibile.`)) return;
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/admin/customers/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      toast.success('Cliente eliminato');
+      refetch();
+    } catch {
+      toast.error('Errore durante l\'eliminazione');
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -66,13 +84,24 @@ export default function AdminCustomers() {
               {customersData.customers.map((customer) => (
                 <div key={customer.id} className="p-4 space-y-1">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="font-semibold truncate">{customer.name}</div>
-                    {customer.tags && customer.tags.includes('vip') && (
-                      <Badge className="bg-yellow-500 hover:bg-yellow-600 shrink-0">VIP</Badge>
-                    )}
+                    <div className="min-w-0">
+                      <div className="font-semibold truncate">{customer.name}</div>
+                      <div className="text-sm text-muted-foreground truncate">{customer.email}</div>
+                      {customer.phone && <div className="text-xs text-muted-foreground">{customer.phone}</div>}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {customer.tags && customer.tags.includes('vip') && (
+                        <Badge className="bg-yellow-500 hover:bg-yellow-600">VIP</Badge>
+                      )}
+                      <Button
+                        variant="ghost" size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-red-50"
+                        onClick={() => handleDelete(customer.id, customer.name)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground truncate">{customer.email}</div>
-                  {customer.phone && <div className="text-xs text-muted-foreground">{customer.phone}</div>}
                   <div className="flex items-center justify-between text-sm pt-1">
                     <span className="text-muted-foreground">{customer.created_at ? new Date(customer.created_at).toLocaleDateString() : 'N/A'}</span>
                     <span className="font-bold text-primary">{formatPrice(customer.total_spent)}</span>
@@ -90,6 +119,7 @@ export default function AdminCustomers() {
                     <TableHead>Data Registrazione</TableHead>
                     <TableHead className="text-right">Ordini</TableHead>
                     <TableHead className="text-right">Totale Speso</TableHead>
+                    <TableHead></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -113,6 +143,15 @@ export default function AdminCustomers() {
                       </TableCell>
                       <TableCell className="text-right font-bold text-primary">
                         {formatPrice(customer.total_spent)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost" size="icon"
+                          className="text-destructive hover:text-destructive hover:bg-red-50"
+                          onClick={() => handleDelete(customer.id, customer.name)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
